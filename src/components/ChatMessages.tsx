@@ -1,6 +1,6 @@
 
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -93,6 +93,7 @@ const CodeBlock: React.FC<CodeProps> = ({ inline, className, children, ...props 
 
 
 const ChatMessage = ({ msg }: {msg: Message}) => {
+  
 
     return (
         <>
@@ -133,6 +134,12 @@ const ChatMessagesComponent:React.FC<ChatMessagesProps> = ({
     isFetchingNextPage,
     fetchMessageForConversation,
 }: ChatMessagesProps) => {
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // useEffect(() => {
+  //     bottomRef.current?.scrollIntoView({behavior: "smooth"});
+  // }, [])
+
     return (
         <>
             <InfiniteScroll 
@@ -144,6 +151,7 @@ const ChatMessagesComponent:React.FC<ChatMessagesProps> = ({
                 <ChatMessage key={index} msg={msg} />
             ))}
             {thinking && <div className="animate-pulse font-extralight">Thinking...</div>}
+            <div ref={bottomRef}/>
         </>
     )
 }

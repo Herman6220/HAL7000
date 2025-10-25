@@ -18,6 +18,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const { conversationId } = useParams();
   const router = useRouter();
@@ -25,10 +26,12 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
 
   const fetchMessageForConversation = async () => {
-    if (!conversationId) {
+    if (!conversationId || isFetchingNextPage) {
       return;
     }
     setIsFetchingNextPage(true);
+
+
     try {
       const before = messages[0]?.createdAt ?? "";
       const response = await fetch(`/api/conversationMessages?conversationId=${conversationId}&before=${before}&limit=${DEFAULT_LIMIT}`, {
@@ -54,6 +57,7 @@ export default function Home() {
       const result = await response.json();
       const reversedMessages = result.message.reverse();
       setMessages(prev => [...reversedMessages, ...prev]);
+
     } catch (error) {
       console.log("Something went wrong", error);
     } finally {
@@ -67,12 +71,13 @@ export default function Home() {
       return;
     }
 
+    setIsSending(true);
     setMessages((prev) => [
       ...prev,
       { role: "user", content: messageToSend, createdAt: new Date().toISOString() },
       { role: "assistant", content: "", createdAt: new Date().toISOString() },
     ]);
-
+    setIsSending(false);
     const callServer = async (userInput: string) => {
       setThinking(true);
       aiMessageRef.current = "";
@@ -152,10 +157,10 @@ export default function Home() {
               <Skeleton className="md:w-120 w-40 h-10 rounded-2xl self-end" />
             </div>
           )}
-          
+
           <ChatMessages messages={messages} thinking={thinking} hasMore={hasMore} isFetchingNextPage={isFetchingNextPage} fetchMessageForConversation={fetchMessageForConversation} />
 
-          <ChatInput handleSend={handleSend} />
+          <ChatInput handleSend={handleSend} isSending={isSending} />
 
           <div className={`fixed inset-x-0 mx-auto z-10 bottom-0 bg-neutral-900 w-full h-20`}></div>
         </div>

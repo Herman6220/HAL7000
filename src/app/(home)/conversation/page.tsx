@@ -107,7 +107,7 @@ export default function Home() {
     }
 
     if (!session.user.emailVerified) {
-      redirect("/user/verifyEmail");
+      redirect("/verifyEmail");
     }
 
     if (!text.trim()) {

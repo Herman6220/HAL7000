@@ -27,7 +27,7 @@ export const AccountManageModal = ({
         >
             <div className="flex flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 items-center">
-                    <p className="text-sm">{email}</p>
+                    <p className="text-sm font-extralight">{email}</p>
                     <div className="rounded-full border-2 border-blue-500 p-0.5">
                         <UserAvatar
                             imageUrl={imageUrl}
@@ -35,7 +35,7 @@ export const AccountManageModal = ({
                             size="lg"
                         />
                     </div>
-                    <p>{name}</p>
+                    <p>Hi, {name}!</p>
                 </div>
                 <button 
                     disabled={true}

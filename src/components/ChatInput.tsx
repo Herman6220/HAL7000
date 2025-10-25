@@ -1,15 +1,17 @@
-import { ArrowUp, PlusIcon } from "lucide-react";
+import { ArrowUp, Loader2, PlusIcon } from "lucide-react";
 import { useSidebar } from "./ui/sidebar";
 import { useState } from "react";
 
 
 interface ChatInputProps{
     handleSend: (text: string) => void;
+    isSending: boolean;
 }
 
 
 export const ChatInput = ({
-    handleSend
+    handleSend,
+    isSending,
 }: ChatInputProps) => {
     const { state } = useSidebar();
     const [text, setText] = useState("");
@@ -69,9 +71,12 @@ export const ChatInput = ({
                         <button
                             className="rounded-full hover:bg-blue-800 bg-blue-700 shadow-md shadow-black p-2 disabled:opacity-50 cursor-pointer"
                             onClick={onSend}
-                            disabled={!text}
+                            disabled={!text || isSending}
                         >
-                            <ArrowUp size="20" />
+                            {isSending 
+                                ? <><Loader2 size="20" className="animate-spin"/></>
+                                : <><ArrowUp size="20" /></>
+                            }
                         </button>
                     </div>
                 </div>
