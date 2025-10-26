@@ -25,6 +25,31 @@ export default function Home() {
   const aiMessageRef = useRef("");
   const [hasMore, setHasMore] = useState(true);
 
+
+  // convertBtn.addEventListener('click', function () {
+  //   const speechSynth = window.speechSynthesis;
+  //   const enteredText = text.value;
+  //   const error = document.querySelector('.error-para');
+
+  //   if (!speechSynth.speaking &&
+  //     !enteredText.trim().length) {
+  //     error.textContent = `Nothing to Convert! 
+  //       Enter text in the text area.`
+  //   }
+
+  //   if (!speechSynth.speaking && enteredText.trim().length) {
+  //     error.textContent = "";
+  //     const newUtter =
+  //       new SpeechSynthesisUtterance(enteredText);
+  //     speechSynth.speak(newUtter);
+  //     convertBtn.textContent = "Sound is Playing..."
+  //   }
+
+  //   setTimeout(() => {
+  //     convertBtn.textContent = "Play Converted Sound"
+  //   }, 5000);
+  // });
+
   const fetchMessageForConversation = async () => {
     if (!conversationId || isFetchingNextPage) {
       return;
@@ -33,7 +58,7 @@ export default function Home() {
     const container = chatContainerRef.current;
     if (!container) return;
 
-    // 1️⃣ Save scroll position before loading
+    // Save scroll position before loading
     const prevScrollHeight = container.scrollHeight;
     const prevScrollTop = container.scrollTop;
 
@@ -156,7 +181,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full h-[90vh] overflow-y-auto" ref={chatContainerRef} style={{scrollbarGutter: "stable", scrollbarWidth: "thin", scrollbarColor: "#888 #171717"}}>
+      <div className="w-full h-[90vh] overflow-y-auto" ref={chatContainerRef} style={{ scrollbarGutter: "stable", scrollbarWidth: "thin", scrollbarColor: "#888 #171717" }}>
         <div className="max-w-3xl w-full mx-auto text-white pt-4 pb-50 md:px-0 md:text-base text-sm px-2 flex flex-col gap-4" >
           {isFetchingNextPage && (
             <div className="flex flex-col gap-4">
@@ -173,7 +198,7 @@ export default function Home() {
             </div>
           )}
 
-          <ChatMessages messages={messages} thinking={thinking} hasMore={hasMore} isFetchingNextPage={isFetchingNextPage} fetchMessageForConversation={fetchMessageForConversation} isSending={isSending}/>
+          <ChatMessages messages={messages} thinking={thinking} hasMore={hasMore} isFetchingNextPage={isFetchingNextPage} fetchMessageForConversation={fetchMessageForConversation} isSending={isSending} />
 
           <ChatInput handleSend={handleSend} isSending={isSending} />
         </div>

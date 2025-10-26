@@ -2,8 +2,8 @@
 
 import { useSidebar } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { ArrowUp, CopyCheckIcon, CopyIcon, PlusIcon } from "lucide-react";
-import { redirect} from "next/navigation";
+import { ArrowUp, Check, CopyCheckIcon, CopyIcon, PlusIcon, StopCircleIcon, Volume2 } from "lucide-react";
+import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -88,8 +88,12 @@ export default function Home() {
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const { state } = useSidebar();
   const { data: session } = authClient.useSession();
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isMessageCopied, setIsMessageCopied] = useState(false);
+  const messageRef = useRef<HTMLDivElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const {activeConversationId, setActiveConversationId, messages, setMessages} = useChat();
+  const { activeConversationId, setActiveConversationId, messages, setMessages } = useChat();
 
   useEffect(() => {
     const parts = window.location.pathname.split("/");
@@ -208,13 +212,45 @@ export default function Home() {
     }
   }
 
-  // useEffect(() => {
-  //   console.log("chatId: ", activeConversationId);
-  // }, [activeConversationId])
+  const textToSpeech = async (text: string) => {
+    const speechSynth = window.speechSynthesis;
+
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    if (isSpeaking) {
+      speechSynth.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    setIsSpeaking(true);
+
+    const voices = window.speechSynthesis.getVoices();
+    const utterance = new SpeechSynthesisUtterance(trimmed);
+    utteranceRef.current = utterance;
+    utterance.rate = 1.0;
+    utterance.pitch = 0.7;
+    utterance.volume = 1.0;
+    utterance.voice = voices[8];
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    speechSynth.speak(utterance);
+  }
+
+  const handleMessageCopy = () => {
+    if (!messageRef.current) return;
+    navigator.clipboard.writeText(messageRef.current.textContent);
+    setIsMessageCopied(true);
+    setTimeout(() => setIsMessageCopied(false), 2000);
+  }
 
   return (
     <>
-      <div className="w-full h-[90vh] overflow-y-auto" ref={chatContainerRef} style={{scrollbarGutter: "stable", scrollbarWidth: "thin", scrollbarColor: "#aaa #171717"}}>
+      <div className="w-full h-[90vh] overflow-y-auto" ref={chatContainerRef} style={{ scrollbarGutter: "stable", scrollbarWidth: "thin", scrollbarColor: "#aaa #171717" }}>
         <div className="max-w-3xl w-full mx-auto text-white pt-18 pb-50 flex flex-col gap-4 relative md:px-0 px-2" >
           {(messages.length === 0 && session) && (
             <div className="w-full flex items-center justify-center">
@@ -239,21 +275,49 @@ export default function Home() {
               style={{ scrollbarColor: "#888 #222" }}
             >
               {msg.role === "assistant" ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({ ...props }) => <h1 className="text-3xl font-bold my-4" {...props} />,
-                    h2: ({ ...props }) => <h1 className="text-2xl font-bold my-3" {...props} />,
-                    h3: ({ ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
-                    code: CodeBlock,
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
+                <>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      h1: ({ ...props }) => <h1 className="text-3xl font-bold my-4" {...props} />,
+                      h2: ({ ...props }) => <h1 className="text-2xl font-bold my-3" {...props} />,
+                      h3: ({ ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
+                      code: CodeBlock,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={handleMessageCopy}
+                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+                    >
+                      {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} />}
+                    </button>
+                    <button
+                      onClick={() => textToSpeech(msg.content)}
+                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+                    >
+                      {isSpeaking ? <StopCircleIcon size={18} /> : <Volume2 size={18} />}
+                    </button>
+                  </div>
+                </>
               ) : (
-                <ReactMarkdown>
-                  {msg.content}
-                </ReactMarkdown>
+                <>
+                  <div className="bg-[#222] px-4 py-2 rounded-2xl my-0.5">
+                    <ReactMarkdown>
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={handleMessageCopy}
+                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+                    >
+                      {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} className="-scale-x-100" />}
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           ))}

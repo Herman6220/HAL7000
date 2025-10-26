@@ -11,7 +11,7 @@ import * as z from "zod"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { signInSchema } from "@/schema/signInSchema";
-import { CopyCheck, CopyIcon } from "lucide-react";
+import { Check, CopyIcon } from "lucide-react";
 
 export default function SignupPage() {
 
@@ -85,14 +85,14 @@ export default function SignupPage() {
                     <p className="text-muted-foreground text-xs font-light">Test email: </p>
                     <p className="text-xs font-light" ref={emailRef}>batman@gmail.com</p>
                     <button onClick={handleEmailCopy} disabled={emailCopied}>
-                        {emailCopied ? <CopyCheck size="14"/> : <CopyIcon size="14" />}
+                        {emailCopied ? <Check size="14"/> : <CopyIcon size="14" />}
                     </button>
                 </div>
                 <div className="flex items-center justify-center gap-1">
                     <p className="text-muted-foreground text-xs font-light">Test password: </p>
                     <p className="text-xs font-light" ref={passwordRef}>imbatman</p>
                     <button onClick={handlePasswordCopy} disabled={passwordCopied}>
-                        {passwordCopied ? <CopyCheck size="14" /> : <CopyIcon size="14" />}
+                        {passwordCopied ? <Check size="14" /> : <CopyIcon size="14" />}
                     </button>
                 </div>
             </div>
