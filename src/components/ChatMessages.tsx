@@ -19,6 +19,11 @@ interface CodeProps {
   children?: React.ReactNode;
 }
 
+interface ChatMessageProps{
+  msg: Message;
+  thinking: boolean;
+}
+
 interface ChatMessagesProps {
   messages: Message[];
   thinking: boolean;
@@ -93,7 +98,7 @@ const CodeBlock: React.FC<CodeProps> = ({ inline, className, children, ...props 
 
 
 
-const ChatMessage = ({ msg }: { msg: Message }) => {
+const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMessageCopied, setIsMessageCopied] = useState(false);
   const messageRef = useRef<HTMLDivElement | null>(null);
@@ -158,7 +163,7 @@ const ChatMessage = ({ msg }: { msg: Message }) => {
             >
               {msg.content}
             </ReactMarkdown>
-            <div className="flex items-center gap-1">
+            <div className={`flex items-center gap-1 ${thinking ? "hidden" : "block"}`}>
               <button
                 onClick={handleMessageCopy}
                 className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
@@ -220,7 +225,7 @@ const ChatMessagesComponent: React.FC<ChatMessagesProps> = ({
         fetchNextPage={fetchMessageForConversation}
       />
       {messages.length > 0 && messages.map((msg, index) => (
-        <ChatMessage key={index} msg={msg} />
+        <ChatMessage key={index} msg={msg} thinking={thinking}/>
       ))}
       {thinking && <div className="animate-pulse font-extralight">Thinking...</div>}
       <div ref={bottomRef} />
