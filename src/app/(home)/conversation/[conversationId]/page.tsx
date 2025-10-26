@@ -29,6 +29,14 @@ export default function Home() {
     if (!conversationId || isFetchingNextPage) {
       return;
     }
+
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    // 1️⃣ Save scroll position before loading
+    const prevScrollHeight = container.scrollHeight;
+    const prevScrollTop = container.scrollTop;
+
     setIsFetchingNextPage(true);
 
 
@@ -58,6 +66,13 @@ export default function Home() {
       const reversedMessages = result.message.reverse();
       setMessages(prev => [...reversedMessages, ...prev]);
 
+      requestAnimationFrame(() => {
+        if (!container) return;
+        const newScrollHeight = container.scrollHeight;
+        // Keep the view anchored where it was before new messages
+        container.scrollTop = newScrollHeight - prevScrollHeight + prevScrollTop;
+      });
+
     } catch (error) {
       console.log("Something went wrong", error);
     } finally {
@@ -77,7 +92,6 @@ export default function Home() {
       { role: "user", content: messageToSend, createdAt: new Date().toISOString() },
       { role: "assistant", content: "", createdAt: new Date().toISOString() },
     ]);
-    setIsSending(false);
     const callServer = async (userInput: string) => {
       setThinking(true);
       aiMessageRef.current = "";
@@ -133,6 +147,7 @@ export default function Home() {
         })
       } finally {
         setThinking(false);
+        setIsSending(false);
       }
     }
 
@@ -141,8 +156,8 @@ export default function Home() {
 
   return (
     <>
-      <div className="w-full min-h-[80vh] h-full">
-        <div className="max-w-3xl w-full mx-auto text-white pt-4 pb-50 md:px-0 md:text-base text-sm px-2 flex flex-col gap-4" ref={chatContainerRef}>
+      <div className="w-full h-[90vh] overflow-y-auto" ref={chatContainerRef} style={{scrollbarGutter: "stable", scrollbarWidth: "thin", scrollbarColor: "#888 #171717"}}>
+        <div className="max-w-3xl w-full mx-auto text-white pt-4 pb-50 md:px-0 md:text-base text-sm px-2 flex flex-col gap-4" >
           {isFetchingNextPage && (
             <div className="flex flex-col gap-4">
               <Skeleton className="w-20 h-10 rounded-2xl self-end" />
@@ -158,11 +173,9 @@ export default function Home() {
             </div>
           )}
 
-          <ChatMessages messages={messages} thinking={thinking} hasMore={hasMore} isFetchingNextPage={isFetchingNextPage} fetchMessageForConversation={fetchMessageForConversation} />
+          <ChatMessages messages={messages} thinking={thinking} hasMore={hasMore} isFetchingNextPage={isFetchingNextPage} fetchMessageForConversation={fetchMessageForConversation} isSending={isSending}/>
 
           <ChatInput handleSend={handleSend} isSending={isSending} />
-
-          <div className={`fixed inset-x-0 mx-auto z-10 bottom-0 bg-neutral-900 w-full h-20`}></div>
         </div>
       </div>
     </>

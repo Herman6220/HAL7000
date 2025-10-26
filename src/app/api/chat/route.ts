@@ -189,7 +189,7 @@ export async function POST(req: Request) {
                 // forward convoId
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ convoId })}\n\n`));
 
-                for await (const [msg, metadata] of await workflow.stream(
+                for await (const [msg] of await workflow.stream(
                     {
                         messages: {
                             role: "human",
@@ -198,9 +198,9 @@ export async function POST(req: Request) {
                     },
                     { streamMode: "messages", configurable: { thread_id: convoId } },
                 )) {
-                    if (msg.content) {
+                    if (AIMessage.isInstance(msg) && msg.content) {
                         console.log(msg.content);
-                        console.log(metadata);
+                        // console.log(metadata);
                         result += msg.content;
                         const content = msg.content || "";
                         if (content) {

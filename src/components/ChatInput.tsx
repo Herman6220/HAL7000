@@ -24,7 +24,7 @@ export const ChatInput = ({
 
     return (
         <>
-            <div className={`fixed ${state === "expanded" ? "md:left-64" : "md:left-12"} inset-x-0 z-20 mx-auto pb-4 p-2 md:pb-2 md:mb-10 max-w-3xl bottom-0 w-full min-h-30 max-h-100 bg-neutral-900 shadow-md shadow-black md:rounded-3xl md:border border-t border-neutral-700 flex flex-col items-center justify-between gap-4 overflow-y-auto transition-all duration-300`}>
+            <div className={`fixed ${state === "expanded" ? "md:left-61.5" : "md:left-9.5"} inset-x-0 z-20 mx-auto pb-4 p-2 md:pb-2 md:mb-10 max-w-3xl bottom-0 w-full min-h-30 max-h-100 bg-neutral-900 shadow-md shadow-black md:rounded-3xl md:border border-t border-neutral-700 flex flex-col items-center justify-between gap-4 overflow-y-auto transition-all duration-300`}>
                 <textarea
                     className="resize-none w-full focus:outline-none text-white p-3 font-workSans font-light"
                     rows={1}
@@ -81,6 +81,7 @@ export const ChatInput = ({
                     </div>
                 </div>
             </div>
+            <div className={`fixed ${state === "expanded" ? "md:left-61.5" : "md:left-9.5"} inset-x-0 max-w-3xl mx-auto z-10 bottom-0 bg-neutral-900 w-full h-20 transition-all duration-300`}></div>
         </>
     )
 }

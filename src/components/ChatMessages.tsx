@@ -1,6 +1,6 @@
 
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -25,6 +25,7 @@ interface ChatMessagesProps {
     hasMore: boolean;
     isFetchingNextPage: boolean;
     fetchMessageForConversation: () => void;
+    isSending: boolean;
 }
 
 // 👇 move this outside the ChatMessage component
@@ -102,7 +103,7 @@ const ChatMessage = ({ msg }: {msg: Message}) => {
                     ? "bg-[#222] self-end px-4 max-w-[70%]"
                     : "self-start max-w-[100%] leading-8"
                     }`}
-                style={{ scrollbarColor: "#888 #222" }}
+                style={{ scrollbarColor: "#888 #171717", scrollbarWidth: "thin" }}
             >
                 {msg.role === "assistant" ? (
                     <ReactMarkdown
@@ -133,12 +134,15 @@ const ChatMessagesComponent:React.FC<ChatMessagesProps> = ({
     hasMore,
     isFetchingNextPage,
     fetchMessageForConversation,
+    isSending,
 }: ChatMessagesProps) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //     bottomRef.current?.scrollIntoView({behavior: "smooth"});
-  // }, [])
+  useEffect(() => {
+    if(isSending){
+      bottomRef.current?.scrollIntoView({behavior: "smooth"});
+    }
+  }, [isSending])
 
     return (
         <>
