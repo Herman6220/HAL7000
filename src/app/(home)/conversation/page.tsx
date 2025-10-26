@@ -269,7 +269,7 @@ export default function Home() {
             <div
               key={index}
               className={`py-2 rounded-2xl font-light overflow-x-auto text-gray-200 ${msg.role === "user"
-                ? "bg-[#222] self-end px-4 max-w-[70%]"
+                ? "self-end px-4 max-w-[70%]"
                 : "self-start max-w-[100%] leading-8"
                 }`}
               style={{ scrollbarColor: "#888 #222" }}
@@ -287,7 +287,7 @@ export default function Home() {
                   >
                     {msg.content}
                   </ReactMarkdown>
-                  <div className={`flex items-center gap-1 ${thinking ? "hidden" : "block"}`}>
+                  <div className={`flex items-center gap-1 ${msg.content.length === 0 ? "hidden" : "block"}`}>
                     <button
                       onClick={handleMessageCopy}
                       className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"

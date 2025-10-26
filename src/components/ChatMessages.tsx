@@ -163,7 +163,7 @@ const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
             >
               {msg.content}
             </ReactMarkdown>
-            <div className={`flex items-center gap-1 ${thinking ? "hidden" : "block"}`}>
+            <div className={`flex items-center gap-1 ${msg.content.length === 0 ? "hidden" : "block"}`}>
               <button
                 onClick={handleMessageCopy}
                 className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
