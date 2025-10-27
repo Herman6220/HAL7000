@@ -122,9 +122,6 @@ const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
     // console.log(voices);
     const utterance = new SpeechSynthesisUtterance(trimmed);
     utteranceRef.current = utterance;
-    utterance.rate = 1.0;
-    utterance.pitch = 0.7;
-    utterance.volume = 1.0;
     utterance.voice = voices.find(v => v.name.includes("Google UK English Male")) || voices[0];
 
     utterance.onstart = () => setIsSpeaking(true);
