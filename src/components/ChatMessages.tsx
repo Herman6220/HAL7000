@@ -119,12 +119,13 @@ const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
     setIsSpeaking(true);
 
     const voices = window.speechSynthesis.getVoices();
+    // console.log(voices);
     const utterance = new SpeechSynthesisUtterance(trimmed);
     utteranceRef.current = utterance;
     utterance.rate = 1.0;
     utterance.pitch = 0.7;
     utterance.volume = 1.0;
-    utterance.voice = voices[8];
+    utterance.voice = voices.find(v => v.name.includes("Google UK English Male")) || voices[0];
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
