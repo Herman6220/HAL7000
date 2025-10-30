@@ -1,4 +1,4 @@
-import { END, MessagesAnnotation, START, StateGraph, MemorySaver } from "@langchain/langgraph";
+import { END, MessagesAnnotation, START, StateGraph} from "@langchain/langgraph";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { tool } from "@langchain/core/tools";
 import { tavily } from "@tavily/core";
@@ -7,14 +7,12 @@ import { db } from "@/db";
 import { conversations, messages } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import {PostgresSaver} from "@langchain/langgraph-checkpoint-postgres";
+import { checkpointer } from "@/lib/checkpointer";
 
 
 // 1. Define the node function
 // 2. Build the Graph
 // 3. Invoke the graph
-
-const DB_URI = process.env.DATABASE_URL!.toString();
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY });
 
 const webSearch = tool(async (query) => {
@@ -87,7 +85,6 @@ const toolNode = async (state: typeof MessagesAnnotation.State) => {
 
 const shouldContinue = async (state: typeof MessagesAnnotation.State) => {
     const lastMessage = state.messages[state.messages.length - 1];
-    // console.log("state", state);
 
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
         return END;
@@ -109,9 +106,7 @@ const graph = new StateGraph(MessagesAnnotation)
     .addConditionalEdges("agent", shouldContinue, ["tools", END])
     .addEdge("agent", END)
 
-// const checkpointer = new MemorySaver();
-const checkpointer = PostgresSaver.fromConnString(DB_URI);
-// await checkpointer.setup();
+// await checkpointer.setup(); // run it only on the first time, for the setup in database.
 const workflow = graph.compile({ checkpointer });
 
 
@@ -235,12 +230,6 @@ export async function POST(req: Request) {
                 "Connection": "keep-alive",
             }
         })
-
-        // return Response.json({
-        //     success: true,
-        //     message: result,
-        //     conversationId: convoId,
-        // }, { status: 200 })
 
     } catch (error) {
         console.log("Something went wrong", error);

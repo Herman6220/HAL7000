@@ -3,6 +3,7 @@ import { conversations } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { and, desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { checkpointer } from "@/lib/checkpointer";
 
 
 export async function POST(req: Request){
@@ -115,6 +116,9 @@ export async function DELETE(req: Request){
                 eq(conversations.id, conversationId),
             ))
             .returning();
+
+        const threadId = removedConversation.id;
+        await checkpointer.deleteThread(threadId);
 
         if(!removedConversation){
             return Response.json({
