@@ -10,6 +10,7 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useChat } from "@/context/ChatContext";
+import { ChatMessage } from "@/components/ChatMessages";
 
 interface CodeProps {
   // node?: any;
@@ -218,39 +219,40 @@ export default function Home() {
     }
   }
 
-  const textToSpeech = async (text: string) => {
-    const speechSynth = window.speechSynthesis;
+  // const textToSpeech = async (text: string) => {
+  //   const speechSynth = window.speechSynthesis;
 
-    const trimmed = text.trim();
-    if (!trimmed) return;
+  //   // const trimmed = text.trim();
+  //   // if (!trimmed) return;
+  //   if(!messageRef.current) return;
 
-    if (isSpeaking) {
-      speechSynth.cancel();
-      setIsSpeaking(false);
-      return;
-    }
+  //   if (isSpeaking) {
+  //     speechSynth.cancel();
+  //     setIsSpeaking(false);
+  //     return;
+  //   }
 
-    setIsSpeaking(true);
+  //   setIsSpeaking(true);
 
-    const voices = window.speechSynthesis.getVoices();
-    // console.log(voices);
-    const utterance = new SpeechSynthesisUtterance(trimmed);
-    utteranceRef.current = utterance;
-    utterance.voice = utterance.voice = voices.find(v => v.name.includes("Google UK English Male")) || voices[0];
+  //   const voices = window.speechSynthesis.getVoices();
+  //   // console.log(voices);
+  //   const utterance = new SpeechSynthesisUtterance(messageRef.current.textContent);
+  //   utteranceRef.current = utterance;
+  //   utterance.voice = utterance.voice = voices.find(v => v.name.includes("Google UK English Male")) || voices[0];
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+  //   utterance.onstart = () => setIsSpeaking(true);
+  //   utterance.onend = () => setIsSpeaking(false);
+  //   utterance.onerror = () => setIsSpeaking(false);
 
-    speechSynth.speak(utterance);
-  }
+  //   speechSynth.speak(utterance);
+  // }
 
-  const handleMessageCopy = () => {
-    if (!messageRef.current) return;
-    navigator.clipboard.writeText(messageRef.current.textContent);
-    setIsMessageCopied(true);
-    setTimeout(() => setIsMessageCopied(false), 2000);
-  }
+  // const handleMessageCopy = () => {
+  //   if (!messageRef.current) return;
+  //   navigator.clipboard.writeText(messageRef.current.textContent);
+  //   setIsMessageCopied(true);
+  //   setTimeout(() => setIsMessageCopied(false), 2000);
+  // }
 
   useEffect(() => {
     if (isSending) {
@@ -276,60 +278,62 @@ export default function Home() {
             </div>
           )}
           {Array.isArray(messages) && messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`py-2 rounded-2xl font-light overflow-x-auto text-gray-200 ${msg.role === "user"
-                ? "self-end px-4 max-w-[70%]"
-                : "self-start max-w-[100%] leading-8"
-                }`}
-              style={{ scrollbarColor: "#888 #222" }}
-            >
-              {msg.role === "assistant" ? (
-                <>
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h1: ({ ...props }) => <h1 className="text-3xl font-bold my-4" {...props} />,
-                      h2: ({ ...props }) => <h1 className="text-2xl font-bold my-3" {...props} />,
-                      h3: ({ ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
-                      code: CodeBlock,
-                    }}
-                  >
-                    {msg.content}
-                  </ReactMarkdown>
-                  <div className={`flex items-center gap-1 ${msg.content.length === 0 ? "hidden" : "block"}`}>
-                    <button
-                      onClick={handleMessageCopy}
-                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
-                    >
-                      {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} />}
-                    </button>
-                    <button
-                      onClick={() => textToSpeech(msg.content)}
-                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
-                    >
-                      {isSpeaking ? <StopCircleIcon size={18} /> : <Volume2 size={18} />}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="bg-[#222] px-4 py-2 rounded-2xl my-0.5">
-                    <ReactMarkdown>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
-                  <div className="flex items-center justify-end gap-1">
-                    <button
-                      onClick={handleMessageCopy}
-                      className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
-                    >
-                      {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} className="-scale-x-100" />}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            // <div
+            //   key={index}
+            //   className={`py-2 rounded-2xl font-light overflow-x-auto text-gray-200 ${msg.role === "user"
+            //     ? "self-end px-4 max-w-[70%]"
+            //     : "self-start max-w-[100%] leading-8"
+            //     }`}
+            //   style={{ scrollbarColor: "#888 #222" }}
+            //   ref={messageRef}
+            // >
+            //   {msg.role === "assistant" ? (
+            //     <>
+            //       <ReactMarkdown
+            //         remarkPlugins={[remarkGfm]}
+            //         components={{
+            //           h1: ({ ...props }) => <h1 className="text-3xl font-bold my-4" {...props} />,
+            //           h2: ({ ...props }) => <h1 className="text-2xl font-bold my-3" {...props} />,
+            //           h3: ({ ...props }) => <h1 className="text-xl font-bold my-2" {...props} />,
+            //           code: CodeBlock,
+            //         }}
+            //       >
+            //         {msg.content}
+            //       </ReactMarkdown>
+            //       <div className={`flex items-center gap-1 ${msg.content.length === 0 ? "hidden" : "block"}`}>
+            //         <button
+            //           onClick={handleMessageCopy}
+            //           className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+            //         >
+            //           {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} />}
+            //         </button>
+            //         <button
+            //           onClick={() => textToSpeech(msg.content)}
+            //           className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+            //         >
+            //           {isSpeaking ? <StopCircleIcon size={18} /> : <Volume2 size={18} />}
+            //         </button>
+            //       </div>
+            //     </>
+            //   ) : (
+            //     <>
+            //       <div className="bg-[#222] px-4 py-2 rounded-2xl my-0.5">
+            //         <ReactMarkdown>
+            //           {msg.content}
+            //         </ReactMarkdown>
+            //       </div>
+            //       <div className="flex items-center justify-end gap-1">
+            //         <button
+            //           onClick={handleMessageCopy}
+            //           className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
+            //         >
+            //           {isMessageCopied ? <Check size={18} /> : <CopyIcon size={18} className="-scale-x-100" />}
+            //         </button>
+            //       </div>
+            //     </>
+            //   )}
+            // </div>
+            <ChatMessage key={index} msg={msg}/>
           ))}
 
           {thinking && (

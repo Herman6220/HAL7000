@@ -21,7 +21,6 @@ interface CodeProps {
 
 interface ChatMessageProps{
   msg: Message;
-  thinking: boolean;
 }
 
 interface ChatMessagesProps {
@@ -98,17 +97,18 @@ const CodeBlock: React.FC<CodeProps> = ({ inline, className, children, ...props 
 
 
 
-const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
+export const ChatMessage = ({ msg }: ChatMessageProps) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMessageCopied, setIsMessageCopied] = useState(false);
   const messageRef = useRef<HTMLDivElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const textToSpeech = async (text: string) => {
+  const textToSpeech = async () => {
     const speechSynth = window.speechSynthesis;
 
-    const trimmed = text.trim();
-    if (!trimmed) return;
+    // const trimmed = text.trim();
+    // if (!trimmed) return;
+    if(!messageRef.current) return;
 
     if (isSpeaking) {
       speechSynth.cancel();
@@ -120,7 +120,7 @@ const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
 
     const voices = window.speechSynthesis.getVoices();
     // console.log(voices);
-    const utterance = new SpeechSynthesisUtterance(trimmed);
+    const utterance = new SpeechSynthesisUtterance(messageRef.current.textContent);
     utteranceRef.current = utterance;
     utterance.voice = voices.find(v => v.name.includes("Google UK English Male")) || voices[0];
 
@@ -169,7 +169,7 @@ const ChatMessage = ({ msg, thinking }: ChatMessageProps) => {
                 {isMessageCopied ? <Check size={18}/> : <CopyIcon size={18}/>}
               </button>
               <button
-                onClick={() => textToSpeech(msg.content)}
+                onClick={() => textToSpeech()}
                 className="text-gray-400 hover:bg-gray-500/50 rounded-full flex items-center justify-center p-1"
               >
                 {isSpeaking ? <StopCircleIcon size={18} /> : <Volume2 size={18} />}
@@ -223,7 +223,7 @@ const ChatMessagesComponent: React.FC<ChatMessagesProps> = ({
         fetchNextPage={fetchMessageForConversation}
       />
       {messages.length > 0 && messages.map((msg, index) => (
-        <ChatMessage key={index} msg={msg} thinking={thinking}/>
+        <ChatMessage key={index} msg={msg}/>
       ))}
       {thinking && <div className="animate-pulse font-extralight">Thinking...</div>}
       <div ref={bottomRef} />

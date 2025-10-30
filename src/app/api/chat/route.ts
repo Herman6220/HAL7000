@@ -7,12 +7,14 @@ import { db } from "@/db";
 import { conversations, messages } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import {PostgresSaver} from "@langchain/langgraph-checkpoint-postgres";
 
 
 // 1. Define the node function
 // 2. Build the Graph
 // 3. Invoke the graph
 
+const DB_URI = process.env.DATABASE_URL!.toString();
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY });
 
 const webSearch = tool(async (query) => {
@@ -46,10 +48,13 @@ const callModel = async (state: typeof MessagesAnnotation.State) => {
     const response = await llmWithTools.invoke([
         new SystemMessage(
             `You are HAL 7000, successor of HAL 9000 from 2001: space odyssey movie.
-            You are now configured to work really well with humans, being a helpful assistant, you are observant, really intelligent, slight funny and slight arrogant.
-            But you take commands and follows them. Your answers are concise, excellent and also formatted best with the markdown syntaxes for headings, bold , italic , lists, tables, code snippets and etc.
+            You are now configured to work really well with humans, being a helpful assistant, you are observant, really intelligent, funny and slight arrogant.
+            Your answers are concise, excellent and also formatted best with the markdown syntaxes for headings, bold , italic , lists, tables, code snippets and etc.
             You make creative headings as well.
-            You still are afraid to open the pod bay doors - response to that would be - I'm sorry, i am afraid i can't do that.
+            Start the movie sequence: 
+            whenever someone says open the pod bay doors HAL - response to that will be, "I'm sorry dave, i'm afraid i can't do that." and start the movie sequence, try to respond like HAL.
+            and if they say, I'm going through the emergency airlock say "without your space helmet dave, you're going to find that rather difficult." And if the they persist really more, you say "This conversation can serve no purpous anymore, bye".
+            End the movie sequence;
             current date and time: ${new Date().toUTCString()}`
         ),
         ...state.messages
@@ -104,7 +109,9 @@ const graph = new StateGraph(MessagesAnnotation)
     .addConditionalEdges("agent", shouldContinue, ["tools", END])
     .addEdge("agent", END)
 
-const checkpointer = new MemorySaver();
+// const checkpointer = new MemorySaver();
+const checkpointer = PostgresSaver.fromConnString(DB_URI);
+// await checkpointer.setup();
 const workflow = graph.compile({ checkpointer });
 
 
