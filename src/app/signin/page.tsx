@@ -55,7 +55,7 @@ export default function SignupPage() {
              * remember the user session after the browser is closed. 
              * @default true
              */
-            rememberMe: false
+            rememberMe: true
         }, {
             //callbacks
             onError: async (error) => {
